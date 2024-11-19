@@ -1,8 +1,16 @@
 class HtmlParser {
   static parseNewHtml(htmlData, parseCreatorOnRise) {
     // matches the special setup of the video elements
-    const jsonDataRegex = /ytInitialData = (.+)?(;<\/script>)/
-    const jsonObject = JSON.parse(htmlData.match(jsonDataRegex)[1])
+    const jsonDataRegex = /ytInitialData\s*=\s*(\{.*?\})\s*;/;
+
+    const match = htmlData.match(jsonDataRegex);
+
+    if (!match || match.length < 2) {
+      throw new Error('Failed to extract JSON data from HTML');
+    }
+
+    const jsonObject = JSON.parse(match[1])
+    
     const jsonContent = jsonObject.contents.twoColumnBrowseResultsRenderer.tabs
       .find(e => e.tabRenderer.selected)
       .tabRenderer
